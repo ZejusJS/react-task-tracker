@@ -3,8 +3,7 @@ import Tasks from './components/Tasks'
 import AddTask from './components/AddTask'
 import { useState, useEffect } from 'react'
 import axios from "axios";
-
-const baseUrl = "http://localhost:4000"
+const BASE_URL = 'http://localhost:4000'
 
 function App() {
   const [showAddTask, setShowAddTask] = useState(false)
@@ -18,29 +17,37 @@ function App() {
   }
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      const res = await axios({
-        method: 'get',
-        url: baseUrl,
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        data: {
-          username: 'Joe Mama'
-        },
-      })
-        .then(res => console.log(res))
+    const getTasks = async () => {
+      const tasksFromServer = await fetchTasks()
+      setTasks(tasksFromServer.data)
     }
 
-    fetchTasks()
-  }, [ /* DEPENDECIES */ ])
+    getTasks()
+  }, [ /* DEPENDECIES */])
 
-  const deleteTask = function (id) {
-    setTasks(tasks.filter((task) => task.id !== id))
+  const fetchTasks = async () => {
+    return await axios({
+      method: 'get',
+      url: BASE_URL + '/get-all-tasks',
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      }
+    })
+  }
+
+  const deleteTask = async function (id) {
+    console.log(id)
+    await axios({
+      method: 'delete',
+      url: BASE_URL + '/delete-task' + `/${id}`
+    })
+
+    const tasksFromServer = await fetchTasks()
+    setTasks(tasksFromServer.data)
   }
 
   const toggleReminder = (id) => {
-    setTasks(tasks.map((task) => task.id === id
+    setTasks(tasks.map((task) => task._id === id
       ?
       { ...task, reminder: !task.reminder }
       :
