@@ -1,7 +1,10 @@
 import Header from './components/Header'
 import Tasks from './components/Tasks'
 import AddTask from './components/AddTask'
+import Footer from './components/Footer'
+import About from './components/About'
 import { useState, useEffect } from 'react'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import axios from "axios";
 const BASE_URL = 'http://localhost:4000'
 
@@ -19,9 +22,12 @@ function App() {
       data: {
         text: task.text,
         day: task.day,
-
+        reminder: task.reminder
       }
     })
+
+    const tasksFromServer = await fetchTasks()
+    setTasks(tasksFromServer.data)
   }
 
   const fetchTasks = async () => {
@@ -42,8 +48,14 @@ function App() {
     setTasks(tasksFromServer.data)
   }
 
-  const toggleReminder = (id) => {
-    setTasks(tasks.map((task) => task._id === id
+  const toggleReminder = async ({ _id, reminder }) => {
+    await axios({
+      method: 'post',
+      url: BASE_URL + '/reminder-task' + `/${_id}` + `?r=${!reminder}`
+    })
+      .catch(err => console.log(err))
+
+    setTasks(tasks.map((task) => task._id === _id
       ?
       { ...task, reminder: !task.reminder }
       :
@@ -60,20 +72,28 @@ function App() {
   }, [ /* DEPENDECIES */])
 
   return (
-    <div className="container">
-      <Header onAdd={() => setShowAddTask(!showAddTask)} showAddTask={showAddTask} />
-      {
-        showAddTask &&
-        <AddTask onAdd={addTask} />
-      }
-      {
-        tasks.length > 0
-          ?
-          <Tasks tasks={tasks} onReminder={toggleReminder} onDelete={deleteTask} />
-          :
-          "No tasks here mate"
-      }
-    </div>
+    <Router>
+      <div className="container">
+        <Header onAdd={() => setShowAddTask(!showAddTask)} showAddTask={showAddTask} />
+        <Routes><Route path="/" exact element={ (
+          <>
+            {
+              showAddTask &&
+              <AddTask onAdd={addTask} />
+            }
+            {
+              tasks.length > 0
+                ?
+                <Tasks tasks={tasks} onReminder={toggleReminder} onDelete={deleteTask} />
+                :
+                "No tasks here mate"
+            }
+          </>
+        )} />
+        <Route path='/about' element={<About />} /></Routes>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 

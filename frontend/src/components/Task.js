@@ -2,7 +2,7 @@ import { FaTimes } from 'react-icons/fa'
 
 const Task = ({ task, onDelete, onReminder }) => {
     return (
-        <div className={`task ${task.reminder ? 'reminder' : ''}`} onDoubleClick={() => onReminder(task._id)}>
+        <div className={`task ${task.reminder ? 'reminder' : ''}`} onDoubleClick={() => onReminder(task)}>
             <h3>{task.text} <FaTimes
                 className='FaTimes'
                 onClick={() => onDelete(task._id)} />

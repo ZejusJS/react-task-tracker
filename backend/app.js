@@ -62,6 +62,12 @@ app.post('/post-task', catchAsync(async function (req, res, next) {
     res.status(200).send('OK')
 }))
 
+app.post('/reminder-task/:taskId', catchAsync(async function (req, res, next) {
+    const taskId = req.params.taskId
+    const reminder = req.query.r
+    await Task.findByIdAndUpdate(taskId, { reminder })
+    res.status(200).send('OK')
+}))
 
 app.use(async (err, req, res, next) => {
     try {
