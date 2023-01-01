@@ -55,6 +55,13 @@ app.delete('/delete-task/:taskId', catchAsync(async function (req, res, next) {
     res.status(200).send('OK')
 }))
 
+app.post('/post-task', catchAsync(async function (req, res, next) {
+    const task = new Task(req.body)
+    console.log(task)
+    await task.save()
+    res.status(200).send('OK')
+}))
+
 
 app.use(async (err, req, res, next) => {
     try {

@@ -9,29 +9,25 @@ function App() {
   const [showAddTask, setShowAddTask] = useState(false)
   const [tasks, setTasks] = useState([])
 
-  const addTask = function (task) {
-    console.log(task)
-    const id = Math.floor(Math.random() * 10000) + 1
-    const newTask = { id, ...task }
-    setTasks([...tasks, newTask])
+  const addTask = async function (task) {
+    await axios({
+      method: 'post',
+      url: BASE_URL + '/post-task',
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: {
+        text: task.text,
+        day: task.day,
+
+      }
+    })
   }
-
-  useEffect(() => {
-    const getTasks = async () => {
-      const tasksFromServer = await fetchTasks()
-      setTasks(tasksFromServer.data)
-    }
-
-    getTasks()
-  }, [ /* DEPENDECIES */])
 
   const fetchTasks = async () => {
     return await axios({
       method: 'get',
-      url: BASE_URL + '/get-all-tasks',
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      }
+      url: BASE_URL + '/get-all-tasks'
     })
   }
 
@@ -53,6 +49,15 @@ function App() {
       :
       task))
   }
+
+  useEffect(() => {
+    const getTasks = async () => {
+      const tasksFromServer = await fetchTasks()
+      setTasks(tasksFromServer.data)
+    }
+
+    getTasks()
+  }, [ /* DEPENDECIES */])
 
   return (
     <div className="container">
